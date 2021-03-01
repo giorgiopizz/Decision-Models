@@ -1,0 +1,451 @@
+---
+title: "Your first contact with R and R Notebooks"
+author: "Michele Ciavotta, Ph.D."
+date: "16 March 2020"
+output:
+  prettydoc::html_pretty:
+    toc: yes
+    toc_depth: 5
+    theme: architect
+    highlight: github
+  html_document:
+    code_download: yes
+    df_print: paged
+    highlight: textmate
+    theme: spacelab
+    toc: yes
+    toc_depth: 5
+  html_notebook:
+    toc: yes
+    toc_depth: 5
+  pdf_document:
+    toc: yes
+    toc_depth: 5
+course: Decision Models
+---
+
+
+## Starting with R
+R is a `language` and `environment` mainly developed for statistics and data-centric computing. It is an open source project project counting a plethora of contributors and thoudands of packages.
+
+This short guide contains the basic commands to get you started in the world of R. It is not exhaustive and does not claim to be so. Online you can find very good material in English as [R-intro](https://cran.r-project.org/doc/manuals/r-release/R-intro.pdf) and in Italian as [nozioniR](https://cran.r-project.org/doc/contrib/nozioniR.pdf).
+
+
+
+```{r echo=TRUE}
+# Command to see if R is working (this is a comment by the way :) )
+# standard deviation of a vector c of values 5,8,12
+sd(c(5,8,12))
+```
+
+- `c()` is the function that builts a vector, that is an oredered colletion of items
+- `sd()` is the function that calculates the *standard deviation*
+
+To get help for a certain function use the `?` command as in the following example:
+
+
+```{r echo=TRUE}
+?sd()
+```
+
+## Basic Calculations
+
+```{r echo=TRUE}
+8*6
+2^16
+myVar <- 2^16
+  ```
+
+## Functions and Variables
+
+Built-in functions are those functions provided by the language. E.g.:
+
+- `sqrt(x)` is the function that calculates the square root of a certain number `x`. 
+- `abs(x)` is the function that calculates the absolute value of a certain number `x`.
+
+The `=` operator assigns the result of an expression to a variable (`<-` can also be used).
+ 
+```{r echo=TRUE}
+sqrt(2)
+
+sqrt(2)
+abs(-65)
+SquareRoot2 = sqrt(2) # asignment to variable SquareRoot2
+SquareRoot2
+```
+
+Besides built-in functions the R language is extensible as it allows the user to create his/her own functions. 
+
+```{r echo=TRUE}
+myfunction <- function(arg1, arg2, ... ){   
+  statements   #uses the arguments argi, to calculate a value
+  #comments
+}  
+```
+
+As a first example, consider a function to calculate the indipendent sample t-statistic (`calssical t-test`), showing “all the steps”. This is an artificial example, of course, since there are other, simpler ways of achieving the same end (`t.test` function).
+
+The function we want to write gives an unpaired two-sample t test for equal variabce.
+It testa hypotheses about differences between two means; however, the means are for the same variable but for two different populations
+Null hypothesis: the population means related to two independent, random samples from an approximately normal distribution are equal.
+
+The test statistic is calculated as:
+$$
+t=\frac{\bar{x}_{1}-\bar{x}_{2}}{\sqrt{s^{2}\left(\frac{1}{n_{1}}+\frac{1}{n_{2}}\right)}} \\
+s^{2}=\frac{\left(n_{1}-1\right) s_{1}^{2}+\left(n_{2}-1\right) s_{2}^{2}}{n_{1}+n_{2}-2}
+$$
+
+where $\bar{x}_1$ and $\bar{x}_2$ are the population means while $n_1$ and $n_2$ are the population sizes.
+
+The function is defined as follows:
+
+```{r}
+twosam <- function(x1, x2) {
+m1 <- mean(x1);
+m2 <- mean(x2);
+n1 <- length(x1);
+n2 <- length(x2);
+s <- ((n1 - 1) * var(x1) + (n2 - 1) * var(x2))/( n1 + n2 -2 ) 
+t <- (m1 - m2)/sqrt(s * (1/n1+1/n2))
+t
+  
+# n1 <- length(x1); 
+# n2 <- length(x2)
+# m1 <- mean(x1); 
+# m2 <- mean(x2)
+# s1 <- var(x1); 
+# s2 <- var(x2)
+# s <- ((n1-1)*s1 + (n2-1)*s2)/(n1+n2-2)
+# tst <- (m1 - m2)/sqrt(s*(1/n1 + 1/n2))
+# tst
+}
+```
+
+
+Let's test the function just created:
+
+```{r}
+p1 <- c(10, 35, 12)
+p2 <- c(19, 2, 14, 1)
+twosam(p1, p2) #our function
+t.test(p1,p2, var.eq=T, paired=F) #R built-in function
+```
+
+## Vectors 
+Vectors are ordered collection of items of the same type. Such items can be of simple built-in types like characters, integers, doubles, strings or more complex ones.
+
+We have seen the `c()` function but there are other functions that returns vectors, like:
+
+- `seq(form, to, by)` is a function that generates a sequence of numbers form `from` to `to` with pace `by`.
+
+```{r echo=TRUE}
+CountryName = c("Brazil", "China", "India", "Switzerland", "USA")
+CountryName # printout of variable CountryName
+LifeExpectancy = c(74, 75, 66, 83, 79)
+LifeExpectancy
+x <- -1:7; x
+y <- 2:-2;y
+# alternative way to get all numbers from 0 to 50 with step 5
+seq(0,50,5) 
+```
+
+
+### How to access elements of a vector?
+Elements of a vector can be accessed using an index (indexation in R is 1-based),
+
+```{r}
+CountryName[1] #accessing the first element of the vector (R is 1 based)
+LifeExpectancy[3] 
+CountryName[-1] #all but the first
+```
+ or a vector of indexes of numbers. 
+ 
+```{r}
+CountryName[c(1,3)]
+```
+ 
+or locicals
+
+```{r}
+CountryName[c(T,F,T,T)] # all but india
+```
+
+### Modify a vector
+You can modify a vector using the (<-) assignment operator. Examples:
+
+```{r}
+x<- -3:3
+x
+x[3] <- 0; x        # modify 3rd element
+x[x<0] <- 5; x      # modify elements less than 0
+x <- x[1:4]; x      # truncate x to first 4 elements
+x <- NULL; x           #delete the vector x
+```
+
+## List
+A list is a data structure having components of mixed data types.
+
+```{r}
+x<- list("a"= 1.5, "b" = TRUE, "c"= 1:5) # a, b and c are "tags" (optionals)
+str(x) # analyze the structure of the list, this is structure function
+```
+
+### How to access components of a list?
+
+Lists can be accessed in similar fashion to vectors.
+
+```{r}
+x
+x[c(1,2)]
+x[-2] # all but the second element
+x[c("a", "c")] # all but the second element
+```
+
+Notice that the `[` operator returns a sublist within the list. Use the `[[` operator to access the element.
+
+```{r}
+typeof(x["a"])
+typeof(x[["a"]])
+```
+
+### Modify a list
+We can change components of a list through reassignment.
+
+```{r}
+x[["a"]]
+x[["a"]] <- TRUE
+x
+x[["d"]] <- "Brazil" # adding a new element in a list
+x
+```
+
+
+
+## Matrix 
+Matrix is a two dimensional data structure in R programming.
+
+Matrix is like a bi-dimensional vector enriched with the dimension attribute. All attributes of an object can be checked with the `attributes()` function (dimension can be checked directly with the `dim()` function).
+ 
+```{r}
+a <- matrix(1:9, nrow = 3, ncol = 3); a
+b <- matrix(1:9, nrow = 3, byrow = T); b
+class(b)
+attributes(a)
+dim(a)
+```
+ 
+It is possible to name the rows and columns of matrix during creation by passing a 2-element list to the argument `dimnames`.
+
+```{r}
+x <- matrix(1:9, nrow = 3, dimnames = list(c("X","Y","Z"), c("A","B","C"))); x
+colnames(x)
+rownames(x)
+x<-cbind(x, c(10, 11, 12)); 
+colnames(x)[4]<- "D"
+x
+```
+
+Dimension of a matrix can be modified using the `dim()` function.
+
+```{r}
+y <-x 
+dim(y) <- c(6,2); # this is reshaping!
+y
+```
+
+
+### How to access Elements of a matrix?
+You can get access to the elements within a matrix using the `[` operator. Elements can be accessed as `<matrixname>[row, column]`. Here `rows` and `columns` are vectors of numeric or logicals.
+
+
+```{r}
+x[1:2, ] # first two rows all columns
+x[c(2,1), ] #first two rows inverted, all columns
+x[c(T,F,T), c(T,F,F,T)] # first and third rows, first and fourth columns
+x[1:2, "A", drop = FALSE] # first two rows and the column A 
+```
+
+### Modify a matrix
+A matrix can be modified by combining access `[` and assignment `<-` operators
+
+```{r}
+x[1,2] 
+x[1,2]<- 3
+x[1,2]
+```
+ 
+ 
+## Data Frames
+No modern and data-oriented programming language can do without data frames.
+A data frame is a *table* or a two-dimensional vector structure in which each `column` contains values of one variable and each `row` contains one set of values from each column.
+
+Following are the characteristics of a data frame.
+
+- The column names should be non-empty.
+- Rows can have names and they should be unique.
+- The data stored in a data frame can be of `numeric`, `factor` or `character` type.
+- Each column is addressed using the `$` symbol.
+
+The function `data.frame` allows to concatenate different vectors into creating a dataframe.
+```{r echo=TRUE}
+factor(CountryName)
+CountryData = data.frame(factor(CountryName), LifeExpectancy)
+CountryData
+typeof(CountryData) # check the type of a variable
+class(CountryData)
+str(CountryData) # str(x) describe the structure of the variable x
+```
+
+### Adding components
+
+New columns can be added on the fly to a data frame.
+
+```{r echo=TRUE}
+CountryData$Population = c(199000, 1390000, 1240000, 7997,318000)
+str(CountryData)
+```
+
+Rows can be added to a data frame using the `rbind()` function
+
+```{r}
+
+levels(CountryData$CountryName)
+CountryData$factor.CountryName = factor(CountryData$factor.CountryName, levels = c(levels(CountryData$factor.CountryName), "Italy")) # add italy as factor
+str(CountryData)
+rbind(CountryData, list( 85, "Italy", 60000000), stringsAsFactors = T)
+CountryData
+```
+
+
+### Functions of a data frame
+Let's see a small set of function to get acquainted with a data frame (`names`, `ncol`, `nrow`, `length`)
+
+```{r}
+names(CountryData)
+ncol(CountryData)
+nrow(CountryData)
+length(CountryData) # length of the list same os ncol
+```
+
+### How to access components of a Data Frame?
+
+
+Components of data frame can be accessed like a list or like a matrix.
+
+List access can be performed using `[`, `[[`, and `$`.
+```{r}
+CountryData['Population']  # this produces a data frame
+CountryData[['Population']] # this reduces the column to a vector
+CountryData$Population # this is equivalente to [[]] 
+```
+
+Access a data frame like a matrix:
+
+```{r}
+CountryData[1:2,] # first two rows and all columns
+CountryData[1:2, 2:3]  #first two rows and last two columns
+CountryData[-1,] # all rows but the first one
+```
+
+### Modify a data frame
+Data frames can be modified like we modified vectors through reassignment (<-)
+
+```{r}
+CountryData[1,"LifeExpectancy"] <- 80  # change the first row column LifeExpectancy
+CountryData
+```
+
+
+## Packages 
+
+All R functions and datasets are contained in the so-called `packages`. Packages a libraries. When a package is loaded its contents are made available. A package management systems is available to ease the installation process of R libraries. 
+
+- `library()` shows which packages are installed.
+- `library("libraryName")` loads the library by its name. This is necessary if some function we need are not in the core of the language. 
+- `require("libraryName")` like `library` loads third-party functions. In case the library is missing returns `FALSE` rather than throwing an error.
+- `install.packages("libraryName")` install missing libraries from the internet.
+
+```{r echo=TRUE}
+
+if(require("knitr")==FALSE){ install.packages("knitr")} # if statement !
+
+library(caTools)
+```
+
+
+
+## Work directory
+In many cases it can be helpful to know and set the work directory, that is the directory of the file system where are located the script we want to execute or the data we want to analyze.
+
+```{r echo=TRUE}
+getwd()
+opts_knit$set(root.dir = "../Dataset")
+getwd()
+setwd("../R")
+```
+
+
+# Driving example: analyzing data from CSV Files
+Let's make a basic data analysis on a dataset provided by the World Health Organization.
+
+## Loading CSV Files
+We will use the `read.csv()` function to read the file and load the data in an R data frame.
+then we will use the following two function to get preliminary information about the data.
+
+- `head(x)` returns a pretty printout of variable x, showing only the first elements.
+- `summary(x)` is a generic function used to produce result summaries of the results of various model fitting functions. 
+
+```{r echo=TRUE}
+opts_knit$set(root.dir = "../R")
+WHO = read.csv("../Dataset/WHO.csv")
+str(WHO)
+head(WHO)
+summary(WHO$Population)
+```
+
+To get a spreadsheet-style data viewer on a matrix-like R object we can use the `View()` function.
+
+```{r}
+View(WHO)
+```
+
+
+## Subsetting Data
+Filtering operation are very commond in Data Science. In R there are several ways to slice part of an original data set, as in the following example:
+
+```{r echo=TRUE}
+WHOEurope = subset(WHO, Region == "Europe")
+dim(WHOEurope)
+dim(WHO)
+```
+
+## Basic Data Analysis
+
+```{r echo=TRUE}
+mean(WHO$Under15) 
+sd(WHO$Under15)         # standard deviation
+summary(WHO$Under15)
+which.min(WHO$Under15)  # argmin function
+WHO$Country[86]
+which.max(WHO$Under15)  # argmax function
+WHO$Country[124]
+```
+
+
+## Plots
+
+Graphical facilities are an important and extremely versatile component of the R environment.
+
+One of the most frequently used plotting functions in R is the `plot()` function. This is a generic function: the type of plot produced is dependent on the `type` or `class` of the first argument.
+In the following we will see two other functions alongside plot(), they are `hist()` and `boxplot()`.
+
+
+```{r echo=TRUE}
+plot(WHO$GNI, WHO$FertilityRate) # scatter plot
+Outliers = subset(WHO, GNI > 10000 & FertilityRate > 2.5)
+hist(WHO$CellularSubscribers)
+boxplot(WHO$LifeExpectancy ~ WHO$Region, ylab = "Life Expectancy", main = "Life Expectancy of Countries by Region" )
+```
+
+
+
